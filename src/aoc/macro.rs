@@ -25,6 +25,35 @@ macro_rules! solution {
     }};
 }
 
+/// Repeating tests that can be run for each Solution.
+///
+/// Compared to `aoc::test!` macro, this one is expected to exists only once per tests module.
+/// The reason is that the test name are not generated based on input. Calling the macro twice
+/// will throw a compilation error.
+///
+/// # Example
+/// ```
+/// #[cfg(test)]
+/// mod tests {
+///   use crate::*;
+///   use crate::{DayXX as day_xx};
+///
+///   aoc::test_common!(day_xx);
+/// }
+/// ```
+///
+#[macro_export]
+macro_rules! test_common {
+    ($d: ident) => {
+        #[test]
+        fn input_exists() {
+            let path = $d::get_input_path();
+
+            std::fs::metadata(&path).expect("Input should exist");
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! test {
     ($d: ident, $i: expr, $e1: expr, $e2: expr) => {

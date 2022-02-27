@@ -31,6 +31,8 @@ mod tests {
     use crate::DayXX as day_xx;
     use crate::*;
 
+    aoc::test_common!(day_xx);
+
     aoc::test!(
         day_xx,
         "Hello",
