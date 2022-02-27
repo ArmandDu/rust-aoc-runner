@@ -38,7 +38,6 @@ pub struct SolutionResult<P1, P2> {
 pub trait Solution {
     const TITLE: &'static str;
     const DAY: u8;
-    const ASSETS: &'static str = "inputs";
 
     type Input;
     type P1;
