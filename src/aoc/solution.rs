@@ -76,7 +76,6 @@ pub trait Solution {
     /// }
     ///
     /// ```
-    ///
     fn get_input_path() -> String {
         format!("inputs/DAY_{:02}.txt", Self::DAY)
     }
@@ -95,11 +94,10 @@ pub trait Solution {
     /// Example
     /// -------
     /// ```
-    ///
     /// struct DayXX;
     /// //impl Solution for DayXX {/*...*/}
     ///
-    /// fn main() {
+    /// fn run_solution() {
     ///     match DayXX::run() {
     ///         Ok(solution) => println!("{}", solution),
     ///         Err(e) => println!("Failed to solve day: {}", e)
