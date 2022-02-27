@@ -38,6 +38,7 @@ pub struct SolutionResult<P1, P2> {
 pub trait Solution {
     const TITLE: &'static str;
     const DAY: u8;
+    const ASSETS: &'static str = "inputs";
 
     type Input;
     type P1;
@@ -62,9 +63,27 @@ pub trait Solution {
         Ok((r, parse_time + time))
     }
 
+    /// Optional overridable method.
+    /// By default, the Self::run() will seek an input file under "<root>/inputs/DAY_<XX>.txt"
+    ///
+    /// If one wants to overwrite the input file for a given solution, then it's possible to
+    /// overwrite this method.
+    ///
+    /// Example
+    /// -------
+    /// ```
+    /// fn get_input_path() -> String {
+    ///     String::from("data/input_day_xx.txt")
+    /// }
+    ///
+    /// ```
+    ///
+    fn get_input_path() -> String {
+        format!("inputs/DAY_{:02}.txt", Self::DAY)
+    }
+
     fn run() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
-        let day = format!("inputs/DAY_{:02}.txt", Self::DAY);
-        let input = std::fs::read_to_string(&day)?;
+        let input = std::fs::read_to_string(&Self::get_input_path())?;
 
         let (input, parse_time) = bench!(Self::parse(input.trim())?);
         let (p1, t1) = bench!(Self::part1(&input));
