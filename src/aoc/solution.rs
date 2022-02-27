@@ -82,6 +82,32 @@ pub trait Solution {
         format!("inputs/DAY_{:02}.txt", Self::DAY)
     }
 
+    /// Solution Runner
+    ///
+    /// This is the main entry point that we want to call for each day.
+    ///
+    /// This method is in charge of:
+    /// - Reading the input file. (path provided by Self::get_input_path)
+    /// - Parsing the input file. (Self::parse - must be implemented)
+    /// - Solving Part1. (Self::part1 - must be implemented)
+    /// - Solving Part2. (Self::part2 - must be implemented)
+    /// - Returning a SolutionResult or a SolutionError
+    ///
+    /// Example
+    /// -------
+    /// ```
+    ///
+    /// struct DayXX;
+    /// //impl Solution for DayXX {/*...*/}
+    ///
+    /// fn main() {
+    ///     match DayXX::run() {
+    ///         Ok(solution) => println!("{}", solution),
+    ///         Err(e) => println!("Failed to solve day: {}", e)
+    ///     }   
+    /// }
+    ///
+    /// ```
     fn run() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
         let input = std::fs::read_to_string(&Self::get_input_path())?;
 
