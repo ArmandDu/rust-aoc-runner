@@ -28,21 +28,25 @@ macro_rules! solution {
 #[macro_export]
 macro_rules! test {
     ($d: ident, $i: expr, $e1: expr, $e2: expr) => {
-        #[test]
-        fn part_1() {
-            let (r, t) = $d::test_part1($i).expect("To be successful");
+        concat_idents::concat_idents!(test_name = test_, $d, _part1_, $i {
+            #[test]
+            fn test_name() {
+                let (r, t) = $d::test_part1($i).expect("couldn't run test:");
 
-            println!("Part1: {:?} (in {}ms)", r, t.as_millis());
-            assert_eq!(r, $e1);
-        }
+                println!("Part1: {:?} (in {}ms)", r, t.as_millis());
+                assert_eq!(r, $e1);
+            }
+        });
 
-        #[test]
-        fn part_2() {
-            let (r, t) = $d::test_part2($i).expect("To be successful");
+        concat_idents::concat_idents!(test_name = test_, $d, _part2_, $i {
+            #[test]
+            fn test_name() {
+                let (r, t) = $d::test_part2($i).expect("couldn't run test:");
 
-            println!("Part2: {:?} (in {}ms)", r, t.as_millis());
-            assert_eq!(r, $e2);
-        }
+                println!("Part2: {:?} (in {}ms)", r, t.as_millis());
+                assert_eq!(r, $e2);
+            }
+        });
     };
 }
 

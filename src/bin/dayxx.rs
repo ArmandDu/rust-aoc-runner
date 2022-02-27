@@ -27,11 +27,12 @@ fn main() {
 }
 
 #[cfg(test)]
-mod day_xx {
+mod tests {
     use crate::*;
+    use crate::{DayXX as day_xx};
 
     aoc::test!(
-        DayXX,
+        day_xx,
         "Hello",
         Some("hello".to_owned()),
         Some("HELLO".to_owned())
