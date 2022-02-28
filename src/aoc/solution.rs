@@ -1,9 +1,10 @@
+use std::fmt::Debug;
 use std::time::Duration;
 
 use derive_more::Display;
 use thiserror::Error;
 
-use crate::bench;
+use crate::time;
 
 #[derive(Debug, Error)]
 pub enum SolutionError {
@@ -11,6 +12,8 @@ pub enum SolutionError {
     ParseError,
     #[error("Input file is missing")]
     NoInput(#[from] std::io::Error),
+    #[error("Error while running solution")]
+    Run,
 }
 
 #[derive(Display)]
@@ -39,9 +42,9 @@ pub trait Solution {
     const TITLE: &'static str;
     const DAY: u8;
 
-    type Input;
-    type P1;
-    type P2;
+    type Input: Sync;
+    type P1: Send;
+    type P2: Send;
 
     fn parse(input: &str) -> Result<Self::Input, SolutionError>;
 
@@ -49,15 +52,15 @@ pub trait Solution {
     fn part2(input: &Self::Input) -> Option<Self::P2>;
 
     fn test_part1(input: &str) -> Result<(Option<Self::P1>, Duration), SolutionError> {
-        let (input, parse_time) = bench!(Self::parse(input)?);
-        let (r, time) = bench!(Self::part1(&input));
+        let (input, parse_time) = time!(Self::parse(input)?);
+        let (r, time) = time!(Self::part1(&input));
 
         Ok((r, parse_time + time))
     }
 
     fn test_part2(input: &str) -> Result<(Option<Self::P2>, Duration), SolutionError> {
-        let (input, parse_time) = bench!(Self::parse(input)?);
-        let (r, time) = bench!(Self::part2(&input));
+        let (input, parse_time) = time!(Self::parse(input)?);
+        let (r, time) = time!(Self::part2(&input));
 
         Ok((r, parse_time + time))
     }
@@ -94,8 +97,27 @@ pub trait Solution {
     /// Example
     /// -------
     /// ```
+    /// use aoc::Solution;
+    ///# use aoc::solution::SolutionError;
+    ///
     /// struct DayXX;
-    /// //impl Solution for DayXX {/*...*/}
+    /// impl Solution for DayXX {
+    ///     //snip implementation...
+    ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+    ///#     type Input = ();type P1 = ();type P2 = ();
+    ///#
+    ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+    ///#         Ok(())
+    ///#         }
+    ///#
+    ///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+    ///#         Some(())
+    ///#     }
+    ///#
+    ///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+    ///#         Some(())
+    ///#     }
+    /// }
     ///
     /// fn run_solution() {
     ///     match DayXX::run() {
@@ -108,9 +130,9 @@ pub trait Solution {
     fn run() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
         let input = std::fs::read_to_string(&Self::get_input_path())?;
 
-        let (input, parse_time) = bench!(Self::parse(input.trim())?);
-        let (p1, t1) = bench!(Self::part1(&input));
-        let (p2, t2) = bench!(Self::part2(&input));
+        let (input, parse_time) = time!(Self::parse(input.trim())?);
+        let (p1, t1) = time!(Self::part1(&input));
+        let (p2, t2) = time!(Self::part2(&input));
 
         Ok(SolutionResult {
             title: Self::TITLE,
@@ -121,5 +143,74 @@ pub trait Solution {
             part2: p2,
             part2_duration: t2,
         })
+    }
+
+    /// Parallel Solution runner
+    ///
+    /// Runs [Solution::part1] and [Solution::part2] in parallel to optimize execution speed
+    ///
+    /// See [Solution::run] for reference
+    ///
+    /// Example
+    /// -------
+    /// ```
+    /// use aoc::Solution;
+    ///# use aoc::solution::SolutionError;
+    ///
+    /// struct DayXX;
+    /// impl Solution for DayXX {
+    ///     //snip implementation...
+    ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+    ///#     type Input = ();type P1 = ();type P2 = ();
+    ///#
+    ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+    ///#         Ok(())
+    ///#         }
+    ///#
+    ///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+    ///#         Some(())
+    ///#     }
+    ///#
+    ///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+    ///#         Some(())
+    ///#     }
+    /// }
+    ///
+    /// fn run_solution() {
+    ///     match DayXX::run_par() {
+    ///         Ok(solution) => println!("{}", solution),
+    ///         Err(e) => println!("Failed to solve day: {}", e)
+    ///     }   
+    /// }
+    ///
+    /// ```    
+    fn run_par() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
+        let input = std::fs::read_to_string(&Self::get_input_path())?;
+
+        let (input, parse_time) = time!(Self::parse(input.trim())?);
+
+        let scope = crossbeam_utils::thread::scope(|s| {
+            let solve1 = s.spawn(|_| time!(Self::part1(&input)));
+            let solve2 = s.spawn(|_| time!(Self::part2(&input)));
+
+            let solve1 = solve1.join();
+            let solve2 = solve2.join();
+
+            (solve1, solve2)
+        })
+        .map_err(|_| SolutionError::Run)?;
+
+        match scope {
+            (Ok((part1, part1_duration)), Ok((part2, part2_duration))) => Ok(SolutionResult {
+                title: Self::TITLE,
+                day: Self::DAY,
+                parse_duration: parse_time,
+                part1,
+                part1_duration,
+                part2,
+                part2_duration,
+            }),
+            _ => Err(SolutionError::Run),
+        }
     }
 }

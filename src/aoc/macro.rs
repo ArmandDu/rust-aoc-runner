@@ -1,5 +1,22 @@
+///Execute an expression and return it with its execution Duration.
+///
+/// #Example
+///```
+/// use std::time::Duration;
+///
+/// fn expensive() -> i32 {
+///    std::thread::sleep(Duration::from_secs(2));
+///    42
+///}
+///
+/// let (result, duration): (i32, Duration) = aoc::time!(expensive());
+///
+/// assert_eq!(result, 42);
+/// assert_eq!(duration.as_secs(), 2)
+///
+/// ```
 #[macro_export]
-macro_rules! bench {
+macro_rules! time {
     ($e:expr) => {{
         use std::time::Instant;
 
@@ -14,7 +31,7 @@ macro_rules! bench {
 #[macro_export]
 macro_rules! solution {
     ($d: ident) => {{
-        match $d::run() {
+        match $d::run_par() {
             Ok(result) => {
                 println!("{}", result)
             }
@@ -56,21 +73,21 @@ macro_rules! test_common {
 
 #[macro_export]
 macro_rules! test {
-    ($d: ident, $i: expr, $e1: expr, $e2: expr) => {
-        concat_idents::concat_idents!(test_name = test_, $d, _part1_, $i {
+    ($name: expr, $d: ident, $input: expr, $e1: expr, $e2: expr) => {
+        concat_idents::concat_idents!(test_name = test_, $d, _part1_, $name {
             #[test]
             fn test_name() {
-                let (r, t) = $d::test_part1($i).expect("couldn't run test:");
+                let (r, t) = $d::test_part1($input).expect("couldn't run test:");
 
                 println!("Part1: {:?} (in {}ms)", r, t.as_millis());
                 assert_eq!(r, $e1);
             }
         });
 
-        concat_idents::concat_idents!(test_name = test_, $d, _part2_, $i {
+        concat_idents::concat_idents!(test_name = test_, $d, _part2_, $name {
             #[test]
             fn test_name() {
-                let (r, t) = $d::test_part2($i).expect("couldn't run test:");
+                let (r, t) = $d::test_part2($input).expect("couldn't run test:");
 
                 println!("Part2: {:?} (in {}ms)", r, t.as_millis());
                 assert_eq!(r, $e2);
@@ -85,14 +102,14 @@ mod tests {
     use std::time::{Duration, Instant};
 
     #[test]
-    fn bench_macro() {
+    fn time_macro() {
         let expr = || {
             thread::sleep(Duration::from_millis(10));
             42
         };
 
         let start = Instant::now();
-        let (result, time) = bench!(expr());
+        let (result, time) = time!(expr());
         let elapsed = Instant::now().duration_since(start);
 
         assert_eq!(result, 42);
