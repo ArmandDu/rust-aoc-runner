@@ -66,7 +66,7 @@ macro_rules! test_common {
         fn input_exists() {
             let path = $d::get_input_path();
 
-            std::fs::metadata(&path).expect("Input should exist");
+            std::fs::metadata(&path).expect(&format!("File: {:?} missing", path));
         }
     };
 }
