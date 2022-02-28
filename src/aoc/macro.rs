@@ -77,9 +77,11 @@ macro_rules! test {
         concat_idents::concat_idents!(test_name = test_, $d, _part1_, $name {
             #[test]
             fn test_name() {
+                use humantime::format_duration;
+
                 let (r, t) = $d::test_part1($input).expect("couldn't run test:");
 
-                println!("Part1: {:?} (in {}ms)", r, t.as_millis());
+                println!("Part1: {:?} (in {})", r, format_duration(t).to_string());
                 assert_eq!(r, $e1);
             }
         });
@@ -87,9 +89,11 @@ macro_rules! test {
         concat_idents::concat_idents!(test_name = test_, $d, _part2_, $name {
             #[test]
             fn test_name() {
+                use humantime::format_duration;
+
                 let (r, t) = $d::test_part2($input).expect("couldn't run test:");
 
-                println!("Part2: {:?} (in {}ms)", r, t.as_millis());
+                println!("Part2: {:?} (in {})", r, format_duration(t).to_string());
                 assert_eq!(r, $e2);
             }
         });

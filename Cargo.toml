@@ -11,6 +11,6 @@ name="aoc"
 
 [dependencies]
 thiserror="1.0.30"
-derive_more = "0.99.17"
 concat-idents = "1.1.3"
 crossbeam-utils="0.8.7"
+humantime="2.1.0"

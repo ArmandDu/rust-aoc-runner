@@ -1,7 +1,7 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display, Formatter};
 use std::time::Duration;
 
-use derive_more::Display;
+use humantime::format_duration;
 use thiserror::Error;
 
 use crate::time;
@@ -16,18 +16,6 @@ pub enum SolutionError {
     Run,
 }
 
-#[derive(Display)]
-#[display(
-    fmt = "Day {:02}: {:?}\n  {:.4}ms\tPart 1: '{:?}'\n  {:.4}ms\tPart 2: '{:?}'\n+ {:.4}ms\tParsing time\n= {:.4}ms\tTotal Time",
-    day,
-    title,
-    "part1_duration.as_millis()",
-    part1,
-    "part2_duration.as_millis()",
-    part2,
-    "parse_duration.as_millis()",
-    "parse_duration.as_millis() + part1_duration.as_millis() + part2_duration.as_millis()"
-)]
 pub struct SolutionResult<P1, P2> {
     title: &'static str,
     day: u8,
@@ -36,6 +24,52 @@ pub struct SolutionResult<P1, P2> {
     parse_duration: Duration,
     part1_duration: Duration,
     part2_duration: Duration,
+}
+
+impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let heading = {
+            let title = format!("Day {:02}: {:?}", self.day, self.title,);
+            let sep: String = (0..=(title.len() + 1)).map(|_| '=').collect();
+
+            format!("{}\n {}\n{}", sep, title, sep)
+        };
+
+        match (&self.part1, &self.part2) {
+            (Some(p1), Some(p2)) => {
+                write!(
+                    f,
+                   "{}\nPart 1: '{}'\nPart 2: '{}'\n----\nTime1:\t\t{}\nTime2:\t\t{}\nParse Time:\t{}\nTotal Time:\t{}",
+                   heading,
+                    p1,
+                    p2,
+                   format_duration(self.part1_duration).to_string(),
+                   format_duration(self.part2_duration).to_string(),
+                   format_duration(self.parse_duration).to_string(),
+                   format_duration(self.part1_duration + self.part2_duration + self.parse_duration).to_string(),
+                )
+            }
+            (Some(p1), _) => {
+                write!(
+                    f,
+                    "{}\nPart 1: '{}'\n----\nTime1:\t\t{}\nParse Time:\t{}\nTotal Time:\t{}",
+                    heading,
+                    p1,
+                    format_duration(self.part1_duration).to_string(),
+                    format_duration(self.parse_duration).to_string(),
+                    format_duration(self.part1_duration + self.parse_duration).to_string(),
+                )
+            }
+            _ => {
+                write!(
+                    f,
+                    "{}\n  {}\tParsing time",
+                    heading,
+                    format_duration(self.parse_duration).to_string(),
+                )
+            }
+        }
+    }
 }
 
 pub trait Solution {
@@ -104,18 +138,18 @@ pub trait Solution {
     /// impl Solution for DayXX {
     ///     //snip implementation...
     ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
-    ///#     type Input = ();type P1 = ();type P2 = ();
+    ///#     type Input = ();type P1 = usize; type P2 = usize;
     ///#
     ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
     ///#         Ok(())
     ///#         }
     ///#
     ///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
-    ///#         Some(())
+    ///#         Some(0)
     ///#     }
     ///#
     ///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
-    ///#         Some(())
+    ///#         Some(0)
     ///#     }
     /// }
     ///
@@ -161,18 +195,18 @@ pub trait Solution {
     /// impl Solution for DayXX {
     ///     //snip implementation...
     ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
-    ///#     type Input = ();type P1 = ();type P2 = ();
+    ///#     type Input = ();type P1 = usize;type P2 = usize;
     ///#
     ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
     ///#         Ok(())
     ///#         }
     ///#
     ///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
-    ///#         Some(())
+    ///#         Some(0)
     ///#     }
     ///#
     ///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
-    ///#         Some(())
+    ///#         Some(0)
     ///#     }
     /// }
     ///
