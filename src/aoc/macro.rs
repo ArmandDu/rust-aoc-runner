@@ -28,7 +28,7 @@ macro_rules! time {
     }};
 }
 
-/// Utility macro that calls [Solution::run] and displays it's output
+/// Utility macro that calls [crate::Solution::run] and displays it's output
 ///
 /// # Example
 /// ```
@@ -104,7 +104,7 @@ macro_rules! test_common {
 ///
 /// Will:
 /// - generate tests for test_part1 and test_part2
-/// - call [Solution::test_part1] and [Solution::test_part2] under the hood
+/// - call [crate::Solution::test_part1] and [crate::Solution::test_part2] under the hood
 /// - assert for result equality
 ///
 /// Example
