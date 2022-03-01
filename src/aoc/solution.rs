@@ -77,8 +77,8 @@ pub trait Solution {
     const DAY: u8;
 
     type Input: Sync;
-    type P1: Send;
-    type P2: Send;
+    type P1: Send + Debug;
+    type P2: Send + Debug;
 
     fn parse(input: &str) -> Result<Self::Input, SolutionError>;
 
@@ -87,16 +87,30 @@ pub trait Solution {
 
     fn test_part1(input: &str) -> Result<(Option<Self::P1>, Duration), SolutionError> {
         let (input, parse_time) = time!(Self::parse(input)?);
-        let (r, time) = time!(Self::part1(&input));
+        let (actual, time) = time!(Self::part1(&input));
+        let total_time = time + parse_time;
 
-        Ok((r, parse_time + time))
+        println!(
+            "Part1: {:?} (in {})",
+            actual,
+            format_duration(total_time).to_string()
+        );
+
+        Ok((actual, total_time))
     }
 
     fn test_part2(input: &str) -> Result<(Option<Self::P2>, Duration), SolutionError> {
         let (input, parse_time) = time!(Self::parse(input)?);
-        let (r, time) = time!(Self::part2(&input));
+        let (actual, time) = time!(Self::part2(&input));
+        let total_time = time + parse_time;
 
-        Ok((r, parse_time + time))
+        println!(
+            "Part2: {:?} (in {})",
+            actual,
+            format_duration(total_time).to_string()
+        );
+
+        Ok((actual, total_time))
     }
 
     /// Optional overridable method.
