@@ -28,6 +28,36 @@ macro_rules! time {
     }};
 }
 
+/// Utility macro that calls [Solution::run] and displays it's output
+///
+/// # Example
+/// ```
+/// use aoc::Solution;
+///# use aoc::solution::SolutionError;
+///
+/// struct DayXX;
+/// impl Solution for DayXX {
+///     //snip implementation...
+///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+///#     type Input = ();type P1 = usize; type P2 = usize;
+///#
+///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+///#         Ok(())
+///#         }
+///#
+///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+///#         Some(123)
+///#     }
+///#
+///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+///#         Some(456)
+///#     }
+/// }
+///
+/// fn run_solution() {
+///     aoc::solution!(DayXX);
+/// }
+/// ```
 #[macro_export]
 macro_rules! solution {
     ($d: ident) => {{
@@ -70,14 +100,61 @@ macro_rules! test_common {
         }
     };
 }
-
+/// Helper macro to generate tests for a Solution
+///
+/// Will:
+/// - generate tests for test_part1 and test_part2
+/// - call [Solution::test_part1] and [Solution::test_part2] under the hood
+/// - assert for result equality
+///
+/// Example
+/// -------
+/// ```
+/// use aoc::Solution;
+///# use aoc::solution::SolutionError;
+///
+/// struct DayXX;
+/// impl Solution for DayXX {
+///     //snip implementation...
+///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+///#     type Input = ();type P1 = usize; type P2 = usize;
+///#
+///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+///#         Ok(())
+///#         }
+///#
+///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+///#         Some(123)
+///#     }
+///#
+///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+///#         Some(456)
+///#     }
+/// }
+///
+/// #[cfg(test)]
+/// mod tests {
+///   use crate::*;
+///   use crate::{DayXX as day_xx};
+///   const INPUT: &'static str = "Input";
+///
+///   aoc::test!(
+///     "test_name",
+///     day_xx,
+///     INPUT,
+///     Some(123), //expected result for part 1
+///     Some(456)  //expected result for part 2
+///   );
+/// }
+///
+/// ```
 #[macro_export]
 macro_rules! test {
     ($name: expr, $d: ident, $input: expr, $e1: expr, $e2: expr) => {
         concat_idents::concat_idents!(test_name = test_, $d, _part1_, $name {
             #[test]
             fn test_name() {
-                let (r, t) = $d::test_part1($input).expect("couldn't run test:");
+                let (r, _) = $d::test_part1($input).expect("couldn't run test:");
                 assert_eq!(r, $e1);
             }
         });
@@ -85,7 +162,7 @@ macro_rules! test {
         concat_idents::concat_idents!(test_name = test_, $d, _part2_, $name {
             #[test]
             fn test_name() {
-                let (r, t) = $d::test_part2($input).expect("couldn't run test:");
+                let (r, _) = $d::test_part2($input).expect("couldn't run test:");
                 assert_eq!(r, $e2);
             }
         });
@@ -94,8 +171,31 @@ macro_rules! test {
 
 #[cfg(test)]
 mod tests {
+    use crate::solution::SolutionError;
+    use crate::*;
     use std::thread;
     use std::time::{Duration, Instant};
+
+    struct D;
+    impl Solution for D {
+        const TITLE: &'static str = "";
+        const DAY: u8 = 0;
+        type Input = ();
+        type P1 = ();
+        type P2 = ();
+
+        fn parse(_input: &str) -> Result<Self::Input, SolutionError> {
+            Ok(())
+        }
+
+        fn part1(_input: &Self::Input) -> Option<Self::P1> {
+            None
+        }
+
+        fn part2(_input: &Self::Input) -> Option<Self::P2> {
+            None
+        }
+    }
 
     #[test]
     fn time_macro() {
@@ -114,4 +214,7 @@ mod tests {
             "bench time should be lower or equal than outer scope duration"
         );
     }
+
+    use D as demo;
+    test!("test_macro", demo, "", None, None);
 }
