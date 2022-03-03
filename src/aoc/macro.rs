@@ -1,3 +1,11 @@
+//! Collection of macros designed to reduce the amount of code duplicated for each days
+//!
+//! Since the Advent of Code is a daily challenge, we need to duplicate some boilerplate every day.
+//! Those macros are intended to reduce the amount of code to be copied / pasted each day.
+//!
+//! You'll usually want to mainly use the `solution!` macro inside your main function.
+//! Or use the `test_common!` and `test!` macros in your tests module.
+
 ///Execute an expression and return it with its execution Duration.
 ///
 /// #Example
