@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! time {
     ($e:expr) => {{
-        use std::time::Instant;
+        use ::std::time::Instant;
 
         let start = Instant::now();
         let result = $e;
@@ -37,7 +37,7 @@ macro_rules! time {
 ///
 /// struct DayXX;
 /// impl Solution for DayXX {
-///     //snip implementation...
+///     //-- snip --
 ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
 ///#     type Input = ();type P1 = usize; type P2 = usize;
 ///#
@@ -96,7 +96,7 @@ macro_rules! test_common {
         fn input_exists() {
             let path = $d::get_input_path();
 
-            std::fs::metadata(&path).expect(&format!("File: {:?} missing", path));
+            ::std::fs::metadata(&path).expect(&format!("File: {:?} missing", path));
         }
     };
 }
@@ -115,7 +115,7 @@ macro_rules! test_common {
 ///
 /// struct DayXX;
 /// impl Solution for DayXX {
-///     //snip implementation...
+///     //-- snip --
 ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
 ///#     type Input = ();type P1 = usize; type P2 = usize;
 ///#
@@ -123,35 +123,31 @@ macro_rules! test_common {
 ///#         Ok(())
 ///#         }
 ///#
-///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
-///#         Some(123)
-///#     }
-///#
-///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
-///#         Some(456)
-///#     }
+///     fn part1(input: &Self::Input) -> Option<Self::P1> { Some(123) }
+///     fn part2(input: &Self::Input) -> Option<Self::P2> { Some(456) }
 /// }
 ///
 /// #[cfg(test)]
 /// mod tests {
 ///   use crate::*;
 ///   use crate::{DayXX as day_xx};
-///   const INPUT: &'static str = "Input";
 ///
 ///   aoc::test!(
-///     "test_name",
 ///     day_xx,
 ///     INPUT,
 ///     Some(123), //expected result for part 1
-///     Some(456)  //expected result for part 2
+///     Some(456),  //expected result for part 2
+///     //add a unique suffix when macro
+///     // is used multiple times in the same module
+///     "optional_suffix"
 ///   );
 /// }
 ///
 /// ```
 #[macro_export]
 macro_rules! test {
-    ($name: expr, $d: ident, $input: expr, $e1: expr, $e2: expr) => {
-        concat_idents::concat_idents!(test_name = test_, $d, _part1_, $name {
+    ($d: ident, $input: expr, $e1: expr, $e2: expr $(,$name: expr)? ) => {
+        ::concat_idents::concat_idents!(test_name = $d, _part1, $( _, $name)? {
             #[test]
             fn test_name() {
                 let (r, _) = $d::test_part1($input).expect("couldn't run test:");
@@ -159,7 +155,7 @@ macro_rules! test {
             }
         });
 
-        concat_idents::concat_idents!(test_name = test_, $d, _part2_, $name {
+        ::concat_idents::concat_idents!(test_name = $d, _part2, $( _, $name)? {
             #[test]
             fn test_name() {
                 let (r, _) = $d::test_part2($input).expect("couldn't run test:");
@@ -176,13 +172,13 @@ mod tests {
     use std::thread;
     use std::time::{Duration, Instant};
 
-    struct D;
-    impl Solution for D {
+    struct Demo;
+    impl Solution for Demo {
         const TITLE: &'static str = "";
         const DAY: u8 = 0;
         type Input = ();
         type P1 = ();
-        type P2 = ();
+        type P2 = usize;
 
         fn parse(_input: &str) -> Result<Self::Input, SolutionError> {
             Ok(())
@@ -193,7 +189,7 @@ mod tests {
         }
 
         fn part2(_input: &Self::Input) -> Option<Self::P2> {
-            None
+            Some(123)
         }
     }
 
@@ -215,6 +211,7 @@ mod tests {
         );
     }
 
-    use D as demo;
-    test!("test_macro", demo, "", None, None);
+    use Demo as test_macro;
+    test!(test_macro, "Some Input", None, Some(123), "with_suffix");
+    test!(test_macro, "Some Input", None, Some(123));
 }
