@@ -94,9 +94,7 @@ macro_rules! test_common {
     ($d: ident) => {
         #[test]
         fn input_exists() {
-            let path = $d::get_input_path();
-
-            ::std::fs::metadata(&path).expect(&format!("File: {:?} missing", path));
+            $d::get_input().expect("An input is required");
         }
     };
 }

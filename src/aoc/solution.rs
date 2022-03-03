@@ -26,6 +26,8 @@ pub struct SolutionResult<P1, P2> {
     part2_duration: Duration,
 }
 
+pub type Result<T> = std::result::Result<T, SolutionError>;
+
 impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let heading = {
@@ -80,12 +82,12 @@ pub trait Solution {
     type P1: Send + Debug;
     type P2: Send + Debug;
 
-    fn parse(input: &str) -> Result<Self::Input, SolutionError>;
+    fn parse(input: &str) -> Result<Self::Input>;
 
     fn part1(input: &Self::Input) -> Option<Self::P1>;
     fn part2(input: &Self::Input) -> Option<Self::P2>;
 
-    fn test_part1(input: &str) -> Result<(Option<Self::P1>, Duration), SolutionError> {
+    fn test_part1(input: &str) -> Result<(Option<Self::P1>, Duration)> {
         let (input, parse_time) = time!(Self::parse(input)?);
         let (actual, time) = time!(Self::part1(&input));
         let total_time = time + parse_time;
@@ -99,7 +101,7 @@ pub trait Solution {
         Ok((actual, total_time))
     }
 
-    fn test_part2(input: &str) -> Result<(Option<Self::P2>, Duration), SolutionError> {
+    fn test_part2(input: &str) -> Result<(Option<Self::P2>, Duration)> {
         let (input, parse_time) = time!(Self::parse(input)?);
         let (actual, time) = time!(Self::part2(&input));
         let total_time = time + parse_time;
@@ -114,7 +116,7 @@ pub trait Solution {
     }
 
     /// Optional overridable method.
-    /// By default, the Self::run() will seek an input file under "<root>/inputs/DAY_<XX>.txt"
+    /// By default, the Self::get_input() will seek an input file under `"<root>/inputs/DAY_<XX>.txt"`
     ///
     /// If one wants to overwrite the input file for a given solution, then it's possible to
     /// overwrite this method.
@@ -122,13 +124,18 @@ pub trait Solution {
     /// Example
     /// -------
     /// ```
-    /// fn get_input_path() -> String {
-    ///     String::from("data/input_day_xx.txt")
+    /// use aoc::solution::Result;
+    ///
+    /// fn get_input() -> Result<String> {
+    ///     Ok("Some Hardcoded Input".to_owned())
     /// }
     ///
     /// ```
-    fn get_input_path() -> String {
-        format!("inputs/DAY_{:02}.txt", Self::DAY)
+    fn get_input() -> Result<String> {
+        let path = format!("inputs/DAY_{:02}.txt", Self::DAY);
+        let input = std::fs::read_to_string(&path)?;
+
+        Ok(input)
     }
 
     /// Solution Runner
@@ -146,7 +153,7 @@ pub trait Solution {
     /// -------
     /// ```
     /// use aoc::Solution;
-    ///# use aoc::solution::SolutionError;
+    ///# use aoc::solution::Result;
     ///
     /// struct DayXX;
     /// impl Solution for DayXX {
@@ -154,7 +161,7 @@ pub trait Solution {
     ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
     ///#     type Input = ();type P1 = usize; type P2 = usize;
     ///#
-    ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+    ///#     fn parse(input: &str) -> Result<Self::Input> {
     ///#         Ok(())
     ///#         }
     ///#
@@ -175,8 +182,8 @@ pub trait Solution {
     /// }
     ///
     /// ```
-    fn run() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
-        let input = std::fs::read_to_string(&Self::get_input_path())?;
+    fn run() -> Result<SolutionResult<Self::P1, Self::P2>> {
+        let input = Self::get_input()?;
 
         let (input, parse_time) = time!(Self::parse(input.trim())?);
         let (p1, t1) = time!(Self::part1(&input));
@@ -203,7 +210,7 @@ pub trait Solution {
     /// -------
     /// ```
     /// use aoc::Solution;
-    ///# use aoc::solution::SolutionError;
+    ///# use aoc::solution::Result;
     ///
     /// struct DayXX;
     /// impl Solution for DayXX {
@@ -211,7 +218,7 @@ pub trait Solution {
     ///#     const TITLE: &'static str = "";const DAY: u8 = 0;
     ///#     type Input = ();type P1 = usize;type P2 = usize;
     ///#
-    ///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+    ///#     fn parse(input: &str) -> Result<Self::Input> {
     ///#         Ok(())
     ///#         }
     ///#
@@ -232,8 +239,8 @@ pub trait Solution {
     /// }
     ///
     /// ```    
-    fn run_par() -> Result<SolutionResult<Self::P1, Self::P2>, SolutionError> {
-        let input = std::fs::read_to_string(&Self::get_input_path())?;
+    fn run_par() -> Result<SolutionResult<Self::P1, Self::P2>> {
+        let input = Self::get_input()?;
 
         let (input, parse_time) = time!(Self::parse(input.trim())?);
 

@@ -1,4 +1,4 @@
-use aoc::solution::{Solution, SolutionError};
+use aoc::solution::{Result, Solution};
 
 struct DayXX;
 
@@ -9,7 +9,7 @@ impl Solution for DayXX {
     type P1 = String;
     type P2 = String;
 
-    fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+    fn parse(input: &str) -> Result<Self::Input> {
         Ok(input.to_owned())
     }
 
