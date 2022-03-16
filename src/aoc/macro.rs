@@ -30,7 +30,7 @@ macro_rules! time {
 
         let start = Instant::now();
         let result = $e;
-        let elapsed = Instant::now().duration_since(start);
+        let elapsed = start.elapsed();
 
         (result, elapsed)
     }};
@@ -208,7 +208,7 @@ mod tests {
 
         let start = Instant::now();
         let (result, time) = time!(expr());
-        let elapsed = Instant::now().duration_since(start);
+        let elapsed = start.elapsed();
 
         assert_eq!(result, 42);
         assert!(
