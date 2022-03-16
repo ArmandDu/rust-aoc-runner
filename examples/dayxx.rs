@@ -33,18 +33,15 @@ mod tests {
 
     aoc::test_common!(day_xx);
 
-    aoc::test!(
-        day_xx,
-        "Hello",
-        Some("hello".to_owned()),
-        Some("HELLO".to_owned())
-    );
-
-    aoc::test!(
-        day_xx,
-        "/*-+",
-        Some("/*-+".to_owned()),
-        Some("/*-+".to_owned()),
-        "special_characters"
-    );
+    aoc::test! {
+        day_xx:
+        [hello]
+        - "Hello"
+            => Some("hello".to_owned())
+            => Some("HELLO".to_owned());
+        [special_chars]
+        - "/*-+"
+            => Some("/*-+".to_owned())
+            => Some("/*-+".to_owned());
+    }
 }

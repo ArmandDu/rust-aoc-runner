@@ -51,10 +51,10 @@ mod tests {
 
     aoc::test_common!(day_01);
 
-    aoc::test!(
-        day_01,
-        "1721\n979\n366\n299\n675\n1456",
-        Some(514579),
-        Some(241861950)
-    );
+    aoc::test! {
+        day_01:
+        - "1721\n979\n366\n299\n675\n1456"
+            => Some(514579)
+            => Some(241861950)
+    }
 }

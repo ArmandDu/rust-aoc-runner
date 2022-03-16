@@ -138,9 +138,18 @@ macro_rules! test_common {
 ///   use crate::*;
 ///   use crate::{DayXX as day_xx};
 ///
+///   aoc::test! {
+///      day_xx:
+///      [case_1]
+///         - "Some Input" => Some(123) => Some(456);
+///      [case_2]
+///         - "Other Input" => Some(123) => Some(456);
+///     }
+///
+///   //alternate syntax
 ///   aoc::test!(
 ///     day_xx,
-///     INPUT,
+///     "Another Input",
 ///     Some(123), //expected result for part 1
 ///     Some(456),  //expected result for part 2
 ///     //add a unique suffix when macro
@@ -152,7 +161,18 @@ macro_rules! test_common {
 /// ```
 #[macro_export]
 macro_rules! test {
-    ($d: ident, $input: expr, $e1: expr, $e2: expr $(,$name: expr)? ) => {
+    (
+        $d:ident:
+        $(
+            $( [$name:ident] )?
+            - $input: expr => $part1:expr => $part2: expr $(;)?
+        )+
+     ) => {
+       $(
+         $crate::test!($d, $input, $part1, $part2 $(, $name )?);
+       )+
+    };
+    ($d:ident, $input:expr, $e1:expr, $e2:expr $(, $name:expr )? ) => {
         ::concat_idents::concat_idents!(test_name = $d, _part1, $( _, $name)? {
             #[test]
             fn test_name() {
@@ -218,6 +238,19 @@ mod tests {
     }
 
     use Demo as test_macro;
+
+    test! {
+        test_macro:
+        [case_1]
+        - "Some Input" => None => Some(123);
+        [case_2]
+        - "Other Input" => None => Some(123);
+    }
+
+    test! {
+        test_macro:
+        - "Some Input" => None => Some(123);
+    }
+
     test!(test_macro, "Some Input", None, Some(123), "with_suffix");
-    test!(test_macro, "Some Input", None, Some(123));
 }
