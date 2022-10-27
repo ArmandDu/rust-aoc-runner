@@ -52,10 +52,10 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
                    heading,
                     p1,
                     p2,
-                   format_duration(self.part1_duration).to_string(),
-                   format_duration(self.part2_duration).to_string(),
-                   format_duration(self.parse_duration).to_string(),
-                   format_duration(self.part1_duration + self.part2_duration + self.parse_duration).to_string(),
+                   format_duration(self.part1_duration),
+                   format_duration(self.part2_duration),
+                   format_duration(self.parse_duration),
+                   format_duration(self.part1_duration + self.part2_duration + self.parse_duration),
                 )
             }
             (Some(p1), _) => {
@@ -64,9 +64,9 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
                     "{}\nPart 1: '{}'\n----\nTime1:\t\t{}\nParse Time:\t{}\nTotal Time:\t{}",
                     heading,
                     p1,
-                    format_duration(self.part1_duration).to_string(),
-                    format_duration(self.parse_duration).to_string(),
-                    format_duration(self.part1_duration + self.parse_duration).to_string(),
+                    format_duration(self.part1_duration),
+                    format_duration(self.parse_duration),
+                    format_duration(self.part1_duration + self.parse_duration),
                 )
             }
             _ => {
@@ -74,7 +74,7 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
                     f,
                     "{}\n  {}\tParsing time",
                     heading,
-                    format_duration(self.parse_duration).to_string(),
+                    format_duration(self.parse_duration),
                 )
             }
         }
@@ -283,7 +283,8 @@ pub trait Solution {
     /// #[cfg(test)]
     /// mod tests {
     ///
-    ///     #[test]
+    /// # use std::assert_eq;
+    /// #[test]
     ///     fn test() {
     ///         let (actual, _) = DayXX::test_part1("123");
     ///         assert_eq!(actual, Some(123));
@@ -299,7 +300,7 @@ pub trait Solution {
         println!(
             "Part1: {:?} (in {})",
             actual,
-            format_duration(total_time).to_string()
+            format_duration(total_time)
         );
 
         Ok((actual, total_time))
@@ -340,7 +341,8 @@ pub trait Solution {
     /// #[cfg(test)]
     /// mod tests {
     ///
-    ///     #[test]
+    /// # use std::assert_eq;
+    /// #[test]
     ///     fn test() {
     ///         let (actual, _) = DayXX::test_part2("123");
     ///         assert_eq!(actual, Some(-123));
@@ -356,7 +358,7 @@ pub trait Solution {
         println!(
             "Part2: {:?} (in {})",
             actual,
-            format_duration(total_time).to_string()
+            format_duration(total_time)
         );
 
         Ok((actual, total_time))
