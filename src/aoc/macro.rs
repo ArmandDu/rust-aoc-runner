@@ -74,7 +74,7 @@ macro_rules! solution {
                 println!("{}", result)
             }
             Err(e) => {
-                print!("Day {} - {:?} Error: {}", $d::DAY, $d::TITLE, e)
+                println!("Day {} - {:?} Error: {}", $d::DAY, $d::TITLE, e)
             }
         }
     }};
