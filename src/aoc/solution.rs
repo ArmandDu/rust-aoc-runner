@@ -330,7 +330,7 @@ pub trait Solution {
     ///#     }
     ///#
     ///     fn part2(input: &Self::Input) -> Option<Self::P2> {
-    ///         Some(-input)
+    ///         Some(-*input)
     ///     }
     /// }
     ///
