@@ -96,7 +96,7 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
 /// ### The utility part includes:
 /// - [Solution:get_input]
 ///
-/// The utility part comes pre define but can be ovewritten if one chooses to.
+/// The utility part comes pre define but can be overwritten if one chooses to.
 ///
 /// ### The methods to be implemented each day are:
 /// - [Solution::TITLE] - used for displaying the solution
@@ -132,7 +132,7 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
 ///     }
 /// }
 ///
-/// DayXX::run();
+/// DayXX::run().expect("Day should run");
 /// ```
 ///
 pub trait Solution {
@@ -153,7 +153,7 @@ pub trait Solution {
     type P2: Send + Debug;
 
     /// Takes the puzzle input as &str and parses it to something more flexible
-    /// to solve the exercices.
+    /// to solve the exercises.
     ///
     /// # Example
     /// ```
@@ -221,7 +221,7 @@ pub trait Solution {
     /// Takes the [Solution::parse]'s output and return the solution for part 2
     ///
     /// You must implement this method. If the method cannot be implemented
-    /// (eg: part 2 unvavailable), return None as a placeholder    
+    /// (eg: part 2 unavailable), return None as a placeholder    
     /// # Example
     /// ```
     /// use aoc::Solution;
@@ -250,7 +250,7 @@ pub trait Solution {
 
     /// Utility method used to test Part 1.
     ///
-    /// This is generaly used in unit tests but can also be used in the main function
+    /// This is generally used in unit tests but can also be used in the main function
     /// Use it to test your solution against smaller inputs and for debugging.
     ///
     /// # Example
@@ -297,18 +297,14 @@ pub trait Solution {
         let (actual, time) = time!(Self::part1(&input));
         let total_time = time + parse_time;
 
-        println!(
-            "Part1: {:?} (in {})",
-            actual,
-            format_duration(total_time)
-        );
+        println!("Part1: {:?} (in {})", actual, format_duration(total_time));
 
         Ok((actual, total_time))
     }
 
     /// Utility method used to test Part 2.
     ///
-    /// This is generaly used in unit tests but can also be used in the main function
+    /// This is generally used in unit tests but can also be used in the main function
     /// Use it to test your solution against smaller inputs and for debugging.
     ///
     /// # Example
@@ -355,11 +351,7 @@ pub trait Solution {
         let (actual, time) = time!(Self::part2(&input));
         let total_time = time + parse_time;
 
-        println!(
-            "Part2: {:?} (in {})",
-            actual,
-            format_duration(total_time)
-        );
+        println!("Part2: {:?} (in {})", actual, format_duration(total_time));
 
         Ok((actual, total_time))
     }
