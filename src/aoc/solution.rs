@@ -436,7 +436,7 @@ pub trait Solution {
     fn run() -> Result<SolutionResult<Self::P1, Self::P2>> {
         let input = Self::get_input()?;
 
-        let (input, parse_time) = time!(Self::parse(input.trim())?);
+        let (input, parse_time) = time!(Self::parse(&input)?);
         let (p1, t1) = time!(Self::part1(&input));
         let (p2, t2) = time!(Self::part2(&input));
 
@@ -493,7 +493,7 @@ pub trait Solution {
     fn run_par() -> Result<SolutionResult<Self::P1, Self::P2>> {
         let input = Self::get_input()?;
 
-        let (input, parse_time) = time!(Self::parse(input.trim())?);
+        let (input, parse_time) = time!(Self::parse(&input)?);
 
         let scope = crossbeam_utils::thread::scope(|s| {
             let solve1 = s.spawn(|_| time!(Self::part1(&input)));
