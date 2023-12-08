@@ -1,6 +1,6 @@
 [package]
 name = "aoc-runner"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 license = "GPL-3"
 description = "Rust Tools for Advent of Code challenges. Focus on writting solutions, not the daily boilerplate."
