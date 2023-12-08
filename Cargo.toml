@@ -1,7 +1,13 @@
 [package]
 name = "aoc-runner"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+license = "GPL-3"
+description = "Rust Tools for Advent of Code challenges. Focus on writting solutions, not the daily boilerplate."
+readme = "README.md"
+homepage = "https://github.com/ArmandDu/rust-aoc-runner"
+repository = "https://github.com/ArmandDu/rust-aoc-runner"
+keywords = ["aoc", "advent-of-code", "utility"]
 
 [lib]
 path="src/aoc/mod.rs"
