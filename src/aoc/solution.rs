@@ -130,8 +130,13 @@ impl<P1: Display, P2: Display> Display for SolutionResult<P1, P2> {
 ///     fn part2(input: &Self::Input) -> Option<Self::P2> {
 ///         None
 ///     }
+///
+///#     fn get_input() -> Result<String> {
+///#         Ok("".to_owned())
+///#     }
 /// }
 ///
+/// // create a file `inputs/DAY_00.txt` then:
 /// DayXX::run().expect("Day should run");
 /// ```
 ///
