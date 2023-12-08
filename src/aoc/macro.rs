@@ -79,6 +79,189 @@ macro_rules! solution {
         }
     }};
 }
+/// Wraps aoc::solution! inside a main function
+///
+/// Helper function when the main is only in charge of running 1 solution.
+///
+/// @example
+/// ```
+/// use aoc::Solution;
+///# use aoc::solution::SolutionError;
+///
+/// struct DayXX;
+/// impl Solution for DayXX {
+///     //-- snip --
+///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+///#     type Input = ();type P1 = usize; type P2 = usize;
+///#
+///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+///#         Ok(())
+///#         }
+///#
+///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+///#         Some(123)
+///#     }
+///#
+///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+///#         Some(456)
+///#     }
+/// }
+///
+/// aoc::run!(DayXX);
+/// ```
+///
+#[macro_export]
+macro_rules! run {
+    ($d:ident) => {
+        fn main() {
+            ::aoc::solution!($d)
+        }
+    }
+}
+
+
+/// Wrapper for `impl Solution for $name {}`
+///
+/// This wrapper will create the struct and implementation.
+/// The only parts left to fill are the dynamic information:
+///  - name             - name of the struct. Eg: Day00
+///  - title            - title of day's puzzle
+///  - day              - puzzle's day
+///  - parse function   - parse input into Self::Input
+///  - part_1 function  - solve part 1 of puzzle
+///  - part_2 function  - solve part 2 of puzzle
+/// @example
+/// ```
+///use itertools::Itertools;
+///use aoc::solution::SolutionError;
+///
+///aoc::implement! {
+///    name: Day00;
+///    title: "addition or product";
+///    day: 0;
+///#    input : "12345".to_owned();
+///    parse   -> Vec<u32> : |input: &str| input.chars().map(|c| c.to_digit(10).ok_or(SolutionError::ParseError)).collect();
+///    part_1  -> u32      : |input: &Self::Input| input.iter().sum1();
+///    part_2  -> u32      : |input: &Self::Input| input.iter().product1();
+///}
+/// ```
+///
+#[macro_export]
+macro_rules! implement {
+    (
+        name    :   $name:ident;
+        title   :   $title:expr;
+        day     :   $day:expr;
+        $(input :   $input:expr;)?
+        parse   -> $ti:ty :   $parse:expr;
+        part_1  ->$tp1:ident :   $part1:expr;
+        part_2  ->$tp2:ident :   $part2:expr;
+
+    ) => {
+        use aoc::Solution;
+        struct $name;
+
+        impl Solution for $name {
+                const TITLE: &'static str = $title;
+                const DAY: u8 = $day;
+                type Input = $ti;
+                type P1 = $tp1;
+                type P2 = $tp2;
+
+                fn parse(input: &str) -> aoc::solution::Result<Self::Input> {
+                    let fun = $parse;
+                    fun(input)
+                }
+
+                fn part1(input: &Self::Input) -> Option<Self::P1> {
+                    let fun = $part1;
+                    fun(input)
+                }
+
+                fn part2(input: &Self::Input) -> Option<Self::P2> {
+                   let fun = $part2;
+                    fun(input)
+                }
+            $(
+                fn get_input() -> aoc::solution::Result<String> {
+                    Ok($input)
+                }
+            )?
+        }
+    }
+}
+
+/// Wrapper/Simplification over the test! macro
+/// This simplifies the test! macro usage and hides some of its caveats.
+///
+/// This macro now creates the whole tests module and populate tests for each example line
+///
+/// @example
+/// ```
+/// use aoc::Solution;
+///# use aoc::solution::SolutionError;
+///
+/// struct DayXX;
+/// impl Solution for DayXX {
+///     //-- snip --
+///#     const TITLE: &'static str = "";const DAY: u8 = 0;
+///#     type Input = ();type P1 = usize; type P2 = usize;
+///#
+///#     fn parse(input: &str) -> Result<Self::Input, SolutionError> {
+///#         Ok(())
+///#         }
+///#
+///#     fn part1(input: &Self::Input) -> Option<Self::P1> {
+///#         Some(123)
+///#     }
+///#
+///#     fn part2(input: &Self::Input) -> Option<Self::P2> {
+///#         Some(456)
+///#     }
+/// }
+///
+/// aoc::example! {
+///     [DayXX]
+///     example: "123" => Some(123) => Some(456)
+/// }
+/// ```
+///
+#[macro_export]
+macro_rules! example {
+    (
+        [$d:ident]
+        $(
+            $name:ident: $input:expr
+                => $part1:expr
+                $(=> $part2:expr)?
+        )+
+    ) => {
+       $(
+        ::concat_idents::concat_idents!(mod_name = tests, _, $name {
+            #[cfg(test)]
+            mod mod_name {
+                 use crate::*;
+                 use crate::{$d};
+
+                 #[test]
+                 fn part1() {
+                     let (r, _) = $d::test_part1($input).expect("couldn't run test:");
+                     assert_eq!(r, $part1);
+                 }
+
+             $(
+                 #[test]
+                 fn part2() {
+                     let (r, _) = $d::test_part2($input).expect("couldn't run test:");
+                     assert_eq!(r, $part2);
+                 }
+             )?
+            }
+        });
+       )+
+    }
+}
+
 
 /// Repeating tests that can be run for each Solution.
 ///
